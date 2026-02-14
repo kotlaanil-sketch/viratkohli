@@ -1,0 +1,149 @@
+Security Ports to open for the AWS EC2 server:
+
+i) HTTP = 80
+
+ii) HTTPS = 443
+
+iii) SSH = 22 (open to only required IP)
+
+iv) Custom port = 9000
+
+ssh -i [keyname.pem] [OSname]@[PublicIP_of_EC2Server]
+sudo apt update
+sudo apt upgrade -y
+sudo apt install -y openjdk-17-jdk
+java -version
+
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" /etc/apt/sources.list.d/pgdg.list'
+
+wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
+
+sudo apt install postgresql postgresql-contrib -y
+
+sudo systemctl enable PostgreSQL
+
+sudo systemctl start PostgreSQL
+
+sudo systemctl status PostgreSQL
+
+psql --version
+
+sudo -i -u postgres
+
+createuser ddsonar
+
+psql
+
+ALTER USER [Created_user_name] WITH ENCRYPTED password 'my_strong_password';
+
+ALTER USER ddsonar WITH ENCRYPTED password 'mwd#2%#!!#%rgs';
+
+CREATE DATABASE ddsonarqube OWNER ddsonar;
+
+GRANT ALL PRIVILEGES ON DATABASE ddsonarqube to ddsonar;
+Press enter or click to view image in full size
+
+
+\l
+\du
+
+\q
+
+exit
+
+sudo apt install zip -y
+
+sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.0.0.68432.zip
+
+ls
+
+sudo unzip sonarqube-10.0.0.68432.zip
+
+sudo mv sonarqube-10.0.0.68432 sonarqube
+sudo mv sonarqube /opt/
+
+sudo groupadd ddsonar
+
+sudo useradd -d /opt/sonarqube -g ddsonar ddsonar
+
+sudo chown ddsonar:ddsonar /opt/sonarqube -R
+
+sudo nano /opt/sonarqube/conf/sonar.properties
+
+a) Find the following lines:add under this line the scheme must be created first
+
+sonar.jdbc.username=ddsonar
+
+sonar.jdbc.password=mwd#2%#!!#%rgs
+
+sonar.jdbc.url=jdbc:postgresql://localhost:5432/ddsonarqube
+
+save and exit the file
+
+sudo nano /opt/sonarqube/bin/linux-x86-64/sonar.sh
+
+
+a) Add the following line
+
+RUN_AS_USER=ddsonar
+
+b) Save and exit the file.
+
+sudo nano /etc/systemd/system/sonar.service
+
+ii) Paste the following lines to the file.
+
+[Unit]
+Description=SonarQube service
+After=syslog.target network.target
+[Service]
+Type=forking
+ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start
+ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
+User=ddsonar
+Group=ddsonar
+Restart=always
+LimitNOFILE=65536
+LimitNPROC=4096
+[Install]
+WantedBy=multi-user.target
+
+iii) Save and exit the file.
+
+iv) Enable the SonarQube service to run at system startup.
+       sudo systemctl enable sonar
+
+sudo systemctl start sonar
+
+sudo systemctl status sonar
+
+9) Modify Kernel System Limits
+SonarQube uses Elasticsearch to store its indices in an MMap FS directory. It requires some changes to the system defaults.
+
+i) Edit the sysctl configuration file.
+
+sudo nano /etc/sysctl.conf
+ii) Add the following lines.under kernel.sysrq=438
+
+vm.max_map_count=262144
+fs.file-max=65536
+ulimit -n 65536
+ulimit -u 4096
+
+iii) Save and exit the file.
+
+iv) Reboot the system to apply the changes.
+
+sudo reboot
+
+10) Access SonarQube Web Interface
+i) Access SonarQube in a web browser at your server’s IP address on port 9000.
+
+For example, http://IP:9000
+
+
+ii) Change the Old password with a New one.
+
+Log in with username admin and password admin. In the next step, SonarQube will prompt you to change your password. CHANGE THE PASSWORD.
+
+

@@ -1,0 +1,25 @@
+sudo wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.89/bin/apache-tomcat-9.0.89.tar.gz
+ 
+sudo tar -xvzf apache-tomcat-9.0.89.tar.gz
+ 
+sudo mv apache-tomcat-9.0.89 tomcat9
+ 
+cd tomcat9
+ 
+sudo chown -R ubuntu:ubuntu ~/tomcat9
+ 
+cd conf
+ 
+vi server.xml
+Change the port 8080 to 9090
+ 
+Cd ..
+ 
+cd bin
+ 
+chmod +x *.sh
+ 
+./startup.sh
+ 
+sudo visudo
+jenkins ALL = (ALL:ALL) NOPASSWD : ALL

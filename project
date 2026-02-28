@@ -1,0 +1,227 @@
+SUPER MARIO GAME DEPLOYMENT 
+(AWS DEVOPS PROJECT) 
+Prerequisite →
+We will use AWS account . 
+Then we configure Terraform inside an ec2 instance
+we also need an IAM ec2 role that provide necessary permission to ec2
+Completion steps →
+Step 1 → Login and basics setup
+Step 2 → Setup Docker ,Terraform ,aws cli , and Kubectl
+Step 3 → IAM Role for EC2
+Step 4 →Attach IAM role with your EC2
+Step 5 → Building Infrastructure Using terraform
+Step 6 → Creation of deployment and service for EKS
+Step 7 → Destroy all the Insrastructure
+
+
+Steps:
+
+
+Step 1 : First we will Launch EC2 machine 
+Go to aws account 
+Go to Instances ->Launch instance
+
+
+
+Use AMI as ubuntu
+
+
+Instance type : T3.medium
+
+
+Create a new key pair 
+
+
+In security group allow ssh and http traffic
+
+
+
+Go ahead and launch the instance
+
+
+
+2) Now we will connect to the machine . For that we will first select the machine 
+And then click on connect button
+Click on Ec2 instance connect tab
+And click on connect button
+
+
+
+3) Run the following commands
+a. sudo su
+b. apt update 
+4) Setup Docker ,Terraform ,aws cli , and Kubectl
+apt install docker.io
+
+2. usermod -aG docker $USER # Replace with your username e.g ‘ubuntu’  usermod -aG docker ubuntu
+   3. newgrp docker
+
+5) We will now setup terraform in the machine 
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
+6) Now we will setup the AWS CL
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+apt install unzip -y
+unzip awscliv2.zip
+sudo ./aws/install
+7) Now we will setup Kubectl 
+sudo apt install curl -y
+curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+
+
+8) Every thing is setup and installed let’s make a IAM EC2 Role
+Go to IAM -> Roles
+
+click on create role and choose EC2 from the dropdown
+
+
+Choose administrator access 
+
+
+
+Next
+
+
+Click on Create role
+
+
+
+9) Now we will attach the IAM role to Ec2 machine
+Go to ec2 machine and select the machine 
+
+
+Right click on the machine 
+
+Click on Security -> modify IAM role
+
+
+
+
+Select IAM role which we created previously 
+
+
+Click on update IAM role
+
+10) Building Infrastructure Using terraform
+First we will clone the github repo 
+ Go to the machine 
+mkdir supermario
+cd supermario
+
+
+git clone https://github.com/akshu20791/supermario-game
+
+
+
+
+
+
+cd supermario-game
+
+
+cd EKS-TF
+
+
+12) Go to aws -> S3 -> Create a s3 bucket with some unique name
+
+
+
+
+
+
+Create bucket 
+13) Go back to Ec2 machine 
+edit the backend.tf file by → vim backend.tf
+
+
+
+Note →make sure to provide your bucket and region name in this file otherwise it doesn’t work and IAM role is also associated with your ec2 which helps ec2 to use other services such S3 bucket
+
+
+14) Now we will run 
+
+terraform init
+
+
+
+
+terraform validate
+
+
+## go to AWS ACCOUNT -> GO TO VPC -> GO TO SUBNETS -> DELETE subnet in availability zone us-east-1e
+
+
+
+terraform plan 
+
+
+
+
+
+terraform apply --auto-approve
+
+
+
+It will take 10-15 minutes to complete 
+
+
+15) Now we will update the configuration of EKS 
+aws eks update-kubeconfig --name EKS_CLOUD --region us-east-1
+# ensure that you take care of the region you are working in 
+
+
+
+
+16) Creation of deployment and service for EKS
+change the directory where deployment and service files are stored use the command → cd ..
+
+create the deployment
+    kubectl apply -f deployment.yaml
+
+
+               kubectl apply -f service.yaml
+
+
+
+
+run → kubectl get all
+
+
+
+16) Now Run the follwing command to get the load balancer ingress
+This command tells all the details of your application
+kubectl describe service mario-service
+
+Here you will see load balancer ingress link 
+Copy that 
+
+
+17) paste it in the browser 
+Ensure that when you copy paste …it should be http not https
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

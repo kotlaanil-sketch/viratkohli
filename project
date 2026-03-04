@@ -110,7 +110,8 @@ First we will clone the github repo
  Go to the machine 
 mkdir supermario
 cd supermario
-
+pwd
+ls
 
 git clone https://github.com/akshu20791/supermario-game
 
@@ -177,7 +178,7 @@ aws eks update-kubeconfig --name EKS_CLOUD --region us-east-1
 
 16) Creation of deployment and service for EKS
 change the directory where deployment and service files are stored use the command → cd ..
-
+ls
 create the deployment
     kubectl apply -f deployment.yaml
 
